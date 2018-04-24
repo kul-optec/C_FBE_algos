@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# ignore build files
+build
+
+# ignore vsstudio code files
+.vscode
