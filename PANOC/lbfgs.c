@@ -21,7 +21,6 @@ static real_t** y; /* y_k = gradient(x_{k+1}) - gradient(x_{k}) */
 static real_t* alpha;
 static real_t* rho;
 
-
 static unsigned int active_buffer_size=0; /* the used buffer size , this is increased at the end of an hessian update */
 static unsigned int buffer_size; /* buffersize initialized in init method */
 static unsigned int dimension;
@@ -33,6 +32,9 @@ static int check_if_valid_update(const real_t* gradient_current_location); /* in
 static real_t* y_data; /* data field used to allocate 2D array y, if only one malloc is used we get cast errors */
 static real_t* s_data; /* data field used to allocate 2D array s, if only one malloc is used we get cast errors */
 static real_t hessian_estimate=0;
+
+static real_t* gradient_current_location;
+static real_t* gradient_new_location;
 
 static int lbfgs_reset_direction(void); /* internal function */
 
@@ -69,6 +71,12 @@ int lbfgs_init(const unsigned int buffer_size_,const unsigned int dimension_prob
     direction =calloc(sizeof(real_t),dimension);
     if(rho==NULL) goto fail_7;
 
+	gradient_current_location = malloc(sizeof(real_t)*dimension);
+	if (gradient_current_location == NULL) goto fail_8;
+
+	gradient_new_location = malloc(sizeof(real_t)*dimension);
+	if (gradient_new_location == NULL) goto fail_9;
+
     /*
      * if all the allocations took place, setup the 2D arrays
      */
@@ -84,6 +92,10 @@ int lbfgs_init(const unsigned int buffer_size_,const unsigned int dimension_prob
     /*
      * Something went wrong free up the necessary memory and return failure
      */
+	fail_9:
+		free(gradient_current_location);
+	fail_8:
+		free(direction);
     fail_7:
         free(rho);
     fail_6:
@@ -114,6 +126,8 @@ int lbfgs_cleanup(void){
         free(rho);
         free(direction);
         active_buffer_size=0;
+		free(gradient_current_location);
+		free(gradient_new_location);
         return SUCCESS;
 }
 
@@ -187,9 +201,8 @@ const real_t* lbfgs_get_direction(void){
 int lbfgs_update_hessian(real_t tau, const real_t* current_location, const real_t* new_location){
     vector_sub(new_location,current_location,dimension,s[buffer_size]); /* set s */
     
-    real_t gradient_current_location[dimension];proximal_gradient_descent_get_current_residual(gradient_current_location);
+    proximal_gradient_descent_get_current_residual(gradient_current_location);
 
-    real_t gradient_new_location[dimension];
     if(tau==0){
         /* direction was never used to calculate forward backward envelop */
         proximal_gradient_descent_get_new_residual(new_location,gradient_new_location);

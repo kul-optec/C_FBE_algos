@@ -29,6 +29,8 @@ static real_t* direction_FBE;
 
 
 int proximal_gradient_descent_init(unsigned int dimension_problem){
+	dimension = dimension_problem;
+
     new_location = malloc(sizeof(real_t)*dimension);
     if(new_location==NULL)goto fail_1;
 
@@ -42,8 +44,6 @@ int proximal_gradient_descent_init(unsigned int dimension_problem){
     if(direction_FBE==NULL)goto fail_4;
 
     if(init_lipschitz_estimator(dimension_problem)==FAILURE) goto fail_5;
-
-    dimension=dimension_problem;
 
     return SUCCESS;
 

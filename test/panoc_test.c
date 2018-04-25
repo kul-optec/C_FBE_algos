@@ -20,7 +20,7 @@ int test_rosen(void){
     problem.cost_gradient_function=rosen_cost_gradient;
     problem.dimension=2;
 
-    problem.solver_params.tolerance=1e-3;
+    problem.solver_params.tolerance=1e-12;
     problem.solver_params.buffer_size=20;
     problem.solver_params.max_interations=200;
 
@@ -30,9 +30,12 @@ int test_rosen(void){
     int iterations = solve_problem(solution);
 
     printf("solution in %d iterations = [%f ; %f] \n",iterations,solution[0],solution[1]);
-    if(ABS(solution[0]-1.0) > 1e-15)
+
+	real_t error = ABS(solution[0] - 1.0);
+    if(error > problem.solver_params.tolerance)
         return FAILURE;
-    if(ABS(solution[1]-1.0) > 1e-15)
+	error = ABS(solution[1] - 1.0);
+    if(error > problem.solver_params.tolerance)
         return FAILURE;
 
     optimizer_cleanup();
