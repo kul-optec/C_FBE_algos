@@ -6,7 +6,9 @@ static struct indicator_box_square_function* indicator_box_square_function_data;
 static real_t g_indicator_box_square_function(const real_t* input);
 static void proxg_indicator_box_square_function(real_t* input);
 
-int constraint_functions_init_box(struct indicator_box_square_function** box_function,unsigned int dimension_){
+int constraint_functions_init_box(struct indicator_box_square_function** box_function,\
+                                    unsigned int dimension_,real_t lower_bound,real_t upper_bound){
+
     *box_function = malloc(sizeof(struct indicator_box_square_function));
     if(*box_function==NULL) return FAILURE;
 
@@ -15,12 +17,13 @@ int constraint_functions_init_box(struct indicator_box_square_function** box_fun
     indicator_box_square_function_data->dimension=dimension_;
     indicator_box_square_function_data->g=g_indicator_box_square_function;
     indicator_box_square_function_data->proxg=proxg_indicator_box_square_function;
-    indicator_box_square_function_data->lower_bound=0;
-    indicator_box_square_function_data->upper_bound=0;
+    indicator_box_square_function_data->lower_bound=lower_bound;
+    indicator_box_square_function_data->upper_bound=upper_bound;
     indicator_box_square_function_data->inf=LARGE;
 
     return SUCCESS;
 }
+
 int constraint_functions_cleanup_box(struct indicator_box_square_function* box_function){
     free(box_function);
     indicator_box_square_function_data=NULL;
@@ -39,6 +42,7 @@ static real_t g_indicator_box_square_function(const real_t* input){
     }
     return 0;
 }
+
 static void proxg_indicator_box_square_function(real_t* input){
     unsigned int i;
     for (i = 0; i < indicator_box_square_function_data->dimension; i++)

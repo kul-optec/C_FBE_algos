@@ -11,7 +11,7 @@ struct solver_parameters{
 struct optimizer_problem{
     unsigned int dimension;
     real_t (*g)(const real_t* input);
-    void (*proxg)(const real_t* input,real_t* output);
+    void (*proxg)(real_t* input);
     real_t (*cost_gradient_function)(const real_t* input,real_t* output_gradient);
     struct solver_parameters solver_params;
 };

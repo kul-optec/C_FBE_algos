@@ -72,15 +72,15 @@ static int optimizer_init(void){
 
 int optimizer_init_with_box(struct optimizer_problem* problem_,real_t lower_bound,real_t upper_bound){
     mode=INDICATOR_BOX_SQUARED;
-    problem=problem_;
-
-    if(optimizer_init()==FAILURE) goto fail_1;
+    problem=problem_;    
 
     /* prepare  g(x) and proxg(x) */
-    constraint_functions_init_box(&indicator_box_square_function_data,problem->dimension);
-    if(indicator_box_square_function_data==NULL) goto fail_2;
-    indicator_box_square_function_data->upper_bound=upper_bound;
-    indicator_box_square_function_data->lower_bound=lower_bound;
+    constraint_functions_init_box(&indicator_box_square_function_data,problem->dimension,lower_bound,upper_bound);
+    if(indicator_box_square_function_data==NULL) goto fail_1;
+    problem->proxg=indicator_box_square_function_data->proxg;
+    problem->g=indicator_box_square_function_data->g;
+
+    if(optimizer_init()==FAILURE) goto fail_2;
 
     new_solution = malloc(sizeof(real_t)*problem->dimension);
     if(new_solution==NULL) goto fail_3;
@@ -88,9 +88,9 @@ int optimizer_init_with_box(struct optimizer_problem* problem_,real_t lower_boun
     return SUCCESS;
 
     fail_3:
-        constraint_functions_cleanup_box(indicator_box_square_function_data);
+        optimizer_cleanup();        
     fail_2:
-        optimizer_cleanup();
+        constraint_functions_cleanup_box(indicator_box_square_function_data);
     fail_1:
         return FAILURE;
 }
@@ -106,7 +106,7 @@ int optimizer_cleanup(void){
     default:
         break;
     }
-
+    free(new_solution);
     initialized=FALSE;
     return SUCCESS;
 }
