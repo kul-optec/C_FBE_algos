@@ -1,11 +1,13 @@
 /*
- * test.c - Matlab Interface to panoc
+ * panoc.c - Matlab Interface to panoc
  *
- * solves non linear programming problems
+ * solves non linear programming problems.
  *
  * The calling syntax is:
  *
- *		outMatrix = arrayProduct(multiplier, inMatrix)
+ *		panoc('init',problem,solver_params);
+ *      number_of_iterations = panoc('solve',solution);
+ *      panoc('cleanup');
  *
  * This is a MEX file for MATLAB.
 */

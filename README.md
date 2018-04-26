@@ -1,10 +1,10 @@
-# draf_panoc
-draft lib of the panoc algorithm with indicator box
+# Draf_panoc
+Draft lib of the panoc algorithm with indicator box.
 
 ## TODO
-- Matlab interface
+- Matlab recompiled library
 - Python interface
+- C#.NET interface
 
-# tips
-
-the -DCMAKE_GENERATOR_PLATFORM=x64 option generates 64 bit visual studio projects
+# Tips
+Check out the Readme in the Matlab folder. It explains how to compile/install the matlab interface.
