@@ -46,15 +46,10 @@ int buffer_cleanup(void){
     free(new_location_df);
     free(current_df);
     precomputed_evaluations=FALSE;
-    #ifdef SINGLE_COST_MODE
     free(pure_prox_location_df);
-    #endif
     return SUCCESS;
 }
 int buffer_renew(const real_t* current_location_){
-    #ifdef PURE_PROX_GRADIENT
-        precomputed_evaluations=FALSE;
-    #endif
     current_location=current_location_;
     /*
      * only renew buffer if it wasn't precomputed

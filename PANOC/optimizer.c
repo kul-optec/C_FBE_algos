@@ -28,9 +28,8 @@ int solve_problem(real_t* solution){
     unsigned int i_panoc;
     real_t current_residual=problem->solver_params.tolerance*10;
     for (i_panoc= 0; i_panoc < problem->solver_params.max_interations ; i_panoc++){
-        if(i_panoc > PANOC_MIN_STEPS && current_residual<problem->solver_params.tolerance){
-            /* if more then PANOC_MIN_STEPS steps are passed 
-               and residual is low stop iterating */
+        if(current_residual<problem->solver_params.tolerance){
+            /* if the residual is low enough stop iterating */
             break;
         }
         current_residual = panoc_get_new_location(solution,new_solution);

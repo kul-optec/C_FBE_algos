@@ -24,11 +24,9 @@ const real_t* buffer_get_new_location_df(void);
 int buffer_set_new_location_as_current_location(void);
 
 
-#ifdef SINGLE_COST_MODE
 int buffer_evaluate_pure_prox_location(const real_t* pure_prox_location);
 int buffer_set_pure_prox_location_as_current_location(void);
 const real_t* buffer_get_pure_prox_df(void);
 real_t buffer_get_pure_prox_f(void);
-#endif
 
 #endif

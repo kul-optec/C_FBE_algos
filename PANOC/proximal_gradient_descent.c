@@ -125,12 +125,8 @@ static int proximal_gradient_descent_check_linesearch(void){
     const real_t inner_product_df_direction = inner_product(df_current_location,direction,dimension);
 
     const real_t f_current_location=buffer_get_current_f();
-    #ifndef SINGLE_COST_MODE
-        const real_t f_new_location=function_evaluator_f(new_location);
-    #else
-        buffer_evaluate_pure_prox_location(new_location);
-        const real_t f_new_location=buffer_get_pure_prox_f();
-    #endif
+    buffer_evaluate_pure_prox_location(new_location);
+    const real_t f_new_location=buffer_get_pure_prox_f();
 
     const real_t norm_direction_gamma = inner_product(direction,direction,dimension); /* direction=gamma*r in paper */
 
@@ -162,14 +158,8 @@ int proximal_gradient_descent_get_new_residual(const real_t* location,real_t* re
     /* 
      * use special buffer so values might be reused later
      */
-    #ifndef SINGLE_COST_MODE
-        buffer_evaluate_new_location(location);
-        const real_t* df_location=buffer_get_new_location_df();
-    #else
-        const real_t* df_location=buffer_get_pure_prox_df();
-    #endif
-    
-    
+    const real_t* df_location=buffer_get_pure_prox_df();
+
     proximal_gradient_descent_forward_backward_step(location,df_location);
     /* calculate the residual, as in normalize the current direction */
     vector_real_mul(direction,dimension,1/linesearch_gamma,residual);

@@ -1,12 +1,5 @@
 /* file generated on 04/18/18 at 15:54:34 */
-#define SINGLE_COST_MODE 1
-/*
-* ---------------------------------
-* Constraint related values
-* ---------------------------------
-*/
-#define NUMBER_OF_CONSTRAINTS 0
-#define DEFAULT_CONSTRAINT_WEIGHT 1
+//#define SINGLE_COST_MODE 1
 /*
 * ---------------------------------
 * constants used with double data type
@@ -19,28 +12,3 @@
 #define MACHINE_ACCURACY DBL_EPSILON
 /* large number use with things like indicator functions */ 
 #define LARGE 10000000000
-/*
-* ---------------------------------
-* lbgfs solver definitions
-* ---------------------------------
-*/
-#define LBGFS_BUFFER_SIZE 20
-/*
-* ---------------------------------
-* NMPC-PANOC solver definitions
-* ---------------------------------
-*/
-#define PANOC_MAX_STEPS 20
-#define PANOC_MIN_STEPS 0
-#define MIN_RESIDUAL (1e-5)
-/*
-* ---------------------------------
-* options used to test:
-* ---------------------------------
-*/
-/*
-* ---------------------------------
-* Optional features
-* ---------------------------------
-*/
-#define INTEGRATOR_CASADI 1

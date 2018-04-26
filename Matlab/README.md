@@ -6,7 +6,7 @@ Requirements:
 
 Instructions:
 1. Execute command "cmake -H. -Bbuild -DCMAKE_GENERATOR_PLATFORM=x64" in the repo directory
-2. Open panoc.sln with visual studio
+2. Go into the build directory and open panoc.sln with visual studio
 3. Select Release build (dropdown button that say's "Debug" by default)
 4. Click on build-> build solution or press F6 (you can close Visual Studio now)
 5. Copy build/PANOC/PANOC_lib.lib into the Matlab folder
