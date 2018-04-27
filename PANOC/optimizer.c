@@ -44,6 +44,9 @@ int solve_problem(real_t* solution){
             save_solution(solution);
             
     }
+
+    panoc_reset_cycli(); /* reset all counters/buffers */
+
     return i_panoc;
 }
 
