@@ -10,16 +10,8 @@ static int set_problem_parameter(const char* propertie_name,const mxArray* data,
 
 /* static variables only needed in mex file */
 static unsigned char constraint_mode;
-static char* name_cost_function;
 
 static int set_problem_parameter(const char* propertie_name,const mxArray* data,struct optimizer_problem* problem){
-    if (strcmp(propertie_name, "cost_function") == 0) {
-        char* name = mxArrayToString(data);
-        name_cost_function = malloc(strlen(name)*sizeof(char));
-        if (name_cost_function == NULL) return FAILURE;
-
-        strcpy(name_cost_function, name);
-    }
     if (strcmp(propertie_name, "dimension") == 0)
         if (mxIsScalar(data))
             problem->dimension = (int)(mxGetScalar(data) + 0.5); /* make sure it rounds down to the right value*/
@@ -76,4 +68,3 @@ int parse_solver(const mxArray *prhs[],struct optimizer_problem* problem){
  * some getters:
  */
 unsigned char parser_get_constraint_mode(void){return constraint_mode;}
-char* parser_get_name_cost_function(void){return name_cost_function;}

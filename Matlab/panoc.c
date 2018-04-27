@@ -6,7 +6,7 @@
  * The calling syntax is:
  *
  *		panoc('init',problem,solver_params);
- *      number_of_iterations = panoc('solve',solution);
+ *      number_of_iterations = panoc('solve',solution,@functionhandle);
  *      panoc('cleanup');
  *
  * This is a MEX file for MATLAB.
@@ -33,6 +33,7 @@ static int init_solver_box(const mxArray* mx_struct_problem);
 /* callback function of the cost/gradient */
 double callback_cost_gradient_function(double* input,double* output);
 
+static mxArray* function_handle;
 /* 
  * The gateway function 
  *  nlhs  :  Number of output (left-side) arguments, or the size of the plhs array.
@@ -64,6 +65,8 @@ void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
         break;
     case SOLVE_MODE:
         double* init_solution = mxGetPr(prhs[1]);
+        function_handle =(mxArray*) (prhs[2]); /* get the function handle */
+        
         int number_of_iterations = solve_problem(init_solution);
         if(nlhs>0) plhs[0] = mxCreateDoubleScalar(number_of_iterations);
         break;
@@ -107,19 +110,21 @@ double callback_cost_gradient_function(const double* input, double* output) {
     mwSize ONE = 1;
     mwSize DIMENSION = problem->dimension;
 
-    mxArray* mx_input_matlab = mxCreateDoubleMatrix(DIMENSION, ONE, mxREAL);
-    static mxArray* mx_output_matlab[2];
+    mxArray* mx_input_matlab[2];
+    mx_input_matlab[0] = function_handle;
+    mx_input_matlab[1] = mxCreateDoubleMatrix(DIMENSION, ONE, mxREAL);
+
+    mxArray* mx_output_matlab[2];
 
     /* set the input values */
-    double* input_matlab = mxGetPr(mx_input_matlab);
+    double* input_matlab = mxGetPr(mx_input_matlab[1]);
     int i;
     for (i = 0; i < problem->dimension; i++)
         input_matlab[i] = input[i];
 
-    /* call the cost/gradient function defined in MATLAB */
-    const char* function_name = parser_get_name_cost_function();
-    int state = mexCallMATLAB(2, mx_output_matlab, 1, &mx_input_matlab, function_name);
-
+    /* call the cost/gradient function handle from MATLAB */
+    int state = mexCallMATLAB(2, mx_output_matlab, 2, mx_input_matlab, "feval");
+    
     /* get the data from the MATLAB matrices */
     double* gradient = mxGetPr(mx_output_matlab[1]);
     double* cost = mxGetPr(mx_output_matlab[0]);
