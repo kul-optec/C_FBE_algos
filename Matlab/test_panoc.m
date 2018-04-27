@@ -1,7 +1,7 @@
 clear all;
 %%
 addpath(genpath('../Matlab'));
-mex -g panoc.c panoc_arguments_check.c panoc_arguments_parse.c PANOC_lib.lib
+mex panoc.c panoc_arguments_check.c panoc_arguments_parse.c PANOC_lib.lib
 %%
 problem.dimension = 2;
 problem.constraint_type = 'box';

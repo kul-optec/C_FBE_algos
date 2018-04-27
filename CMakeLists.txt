@@ -1,7 +1,7 @@
 ### make sure the user is doing an our of source build:
-if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
-    message( FATAL_ERROR "In-source builds are not allowed. use cmake -H. -Bbuild instead to build in the build folder" )
-endif()
+ if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
+     message( FATAL_ERROR "In-source builds are not allowed. use cmake -H. -Bbuild instead to build in the build folder" )
+ endif()
 ###
 
 cmake_minimum_required (VERSION 2.6)
@@ -19,6 +19,10 @@ endif()
 # subdirectories with libraries
 include_directories ("${PROJECT_SOURCE_DIR}/PANOC")
 add_subdirectory (PANOC) # read out the cmakelist file
+
+# subdirectories with demos
+include_directories ("${PROJECT_SOURCE_DIR}/demo_nmpc_casadi")
+add_subdirectory (demo_nmpc_casadi) # read out the cmakelist file
 
 # Test the functionality
 enable_testing()

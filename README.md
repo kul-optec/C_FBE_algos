@@ -1,5 +1,7 @@
 # Draf_panoc
-Draft lib of the panoc algorithm with indicator box.
+A simple library of the panoc algorithm with indicator box.
+
+![graph with convergence time](timings.png)
 
 ## TODO
 - Matlab recompiled library
