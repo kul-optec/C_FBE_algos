@@ -37,7 +37,7 @@ static real_t g_indicator_box_square_function(const real_t* input){
     unsigned int i;
     for (i = 0; i < indicator_box_square_function_data->dimension; i++)
     {
-        if(input[i]<indicator_box_square_function_data->lower_bound || input[i]<indicator_box_square_function_data->upper_bound )
+        if(input[i]<indicator_box_square_function_data->lower_bound || input[i]>indicator_box_square_function_data->upper_bound )
             return indicator_box_square_function_data->inf;
     }
     return 0;
