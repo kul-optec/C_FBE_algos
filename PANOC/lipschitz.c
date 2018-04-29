@@ -54,7 +54,9 @@ real_t get_lipschitz(void){
      * L = norm((df(x+delta)-df(x))/delta) 
      * reuse the current_position_delta values as buffer
      */
-    vector_sub(df_current_position,df_current_position_delta, dimension,current_position_delta); /* step1: df(x+delta)-df(x) */
+    vector_copy(df_current_position,current_position_delta,dimension); /* step1: df(x+delta)-df(x) */
+    vector_add_ntimes(current_position_delta,df_current_position_delta,dimension,-1.); 
+    
     const real_t numerator = vector_norm2(current_position_delta, dimension); /* step2: norm((df(x+delta)-df(x))) */
 
     return numerator/denominator;

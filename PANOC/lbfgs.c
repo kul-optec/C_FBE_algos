@@ -159,7 +159,8 @@ const real_t* lbfgs_get_direction(void){
         /* 
          * use gradient descent for first iteration 
          */
-        vector_minus(direction_prox_gradient,direction,dimension); /* set the direction */
+        vector_copy(direction_prox_gradient,direction,dimension); /* set the direction equal to the prox gradient */
+        vector_real_mul(direction,dimension,-1.); /* go downwards instead of upwards */
     }else{
         int buffer_limit; /* how much of the buffer should i use in this iteration? */
         if(active_buffer_size<buffer_size){
@@ -182,8 +183,8 @@ const real_t* lbfgs_get_direction(void){
             vector_add_ntimes(q,y[i],dimension,-alpha[i]);
         }
 
-        real_t* z = direction; /* use the direction variable temporarily as z */
-        vector_real_mul(q,dimension,hessian_estimate,z);
+        real_t* z = direction; /* use the direction variable temporarily as z, this also means z=q */
+        vector_real_mul(z,dimension,hessian_estimate);
         /*
          * Second loop lbfgs
          */
@@ -193,13 +194,16 @@ const real_t* lbfgs_get_direction(void){
             beta=rho[i]*inner_product(y[i],z,dimension);
             vector_add_ntimes(z,s[i],dimension,(alpha[i]-beta)); 
         }
-        vector_minus(z,direction,dimension); /* z contains upward direction, multiply with -1 to get downward direction */
+
+        vector_copy(z,direction,dimension); /* z contains upward direction */
+        vector_real_mul(direction,dimension,-1.);/* multiply with -1 to get downward direction */
     }
     
     return direction;
 }
 int lbfgs_update_hessian(real_t tau, const real_t* current_location, const real_t* new_location){
-    vector_sub(new_location,current_location,dimension,s[buffer_size]); /* set s */
+    vector_copy(new_location,s[buffer_size],dimension); /* set s=x_nex - x_old */
+    vector_add_ntimes(s[buffer_size],current_location,dimension,-1.);
     
     proximal_gradient_descent_get_current_residual(gradient_current_location);
 
@@ -211,11 +215,13 @@ int lbfgs_update_hessian(real_t tau, const real_t* current_location, const real_
         proximal_gradient_descent_get_new_residual_buffered(gradient_new_location);
     }
     
-    vector_sub(gradient_new_location,gradient_current_location,dimension,y[buffer_size]); /* set y=df(new_x) - df(x) */
+    // vector_sub(gradient_new_location,gradient_current_location,dimension,y[buffer_size]);
+    vector_copy(gradient_new_location,y[buffer_size],dimension);  /* set y=df(new_x) - df(x) */
+    vector_add_ntimes(y[buffer_size],gradient_current_location,dimension,-1.);
 
     /* scale gamma, this is done in ForBes , but not correct according to paper */
     real_t gamma = proximal_gradient_descent_get_gamma();
-    vector_real_mul(y[buffer_size],dimension,gamma,y[buffer_size]);
+    vector_real_mul(y[buffer_size],dimension,gamma);
 
     if(check_if_valid_update(gradient_current_location)==SUCCESS){
         shift_s_and_y();  /* shift the s and y buffers */

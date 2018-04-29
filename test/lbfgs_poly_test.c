@@ -52,7 +52,8 @@ int checkIfSolutionIsReached(void){
     {
         buffer_renew(current_location);
         const real_t* direction = lbfgs_get_direction();
-        vector_add(current_location,direction,DIMENSION,next_location);
+        vector_copy(current_location,next_location,DIMENSION);
+        vector_add_ntimes(next_location,direction,DIMENSION,1.);
         real_t tau =0.;
         lbfgs_update_hessian(tau,current_location,next_location);
         vector_copy(next_location,current_location,DIMENSION);
@@ -90,7 +91,8 @@ int check2thdegreepolynomial(void){
     {
         buffer_renew(current_location);
         const real_t* direction = lbfgs_get_direction();
-        vector_add(current_location,direction,DIMENSION,next_location);
+        vector_copy(current_location,next_location,DIMENSION);
+        vector_add_ntimes(next_location,direction,DIMENSION,1.);
         real_t tau =0.;
         lbfgs_update_hessian(tau,current_location,next_location);
         vector_copy(next_location,current_location,DIMENSION);
@@ -149,7 +151,8 @@ int rosenbrock_test(void){
     {
         buffer_renew(current_location);
         const real_t* direction = lbfgs_get_direction();
-        vector_add(current_location,direction,DIMENSION,next_location);
+        vector_copy(current_location,next_location,DIMENSION);
+        vector_add_ntimes(next_location,direction,DIMENSION,1.);
         real_t tau =0.;
         lbfgs_update_hessian(tau,current_location,next_location);
         vector_copy(next_location,current_location,DIMENSION);

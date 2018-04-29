@@ -145,7 +145,10 @@ static int proximal_gradient_descent_forward_backward_step(const real_t* locatio
     vector_add_ntimes(new_location,df_location,dimension,-1*linesearch_gamma); /* new_location = location - gamma * df_location */
     
     function_evaluator_proxg(new_location); /* new_location = proxg(new_location) */
-    vector_sub(location,new_location,dimension,direction); /* find the direction */
+    
+    vector_copy(location,direction,dimension); /* find the direction */
+    vector_add_ntimes(direction,new_location,dimension,-1.);
+     
     return SUCCESS;
 }
 
@@ -162,7 +165,8 @@ int proximal_gradient_descent_get_new_residual(const real_t* location,real_t* re
 
     proximal_gradient_descent_forward_backward_step(location,df_location);
     /* calculate the residual, as in normalize the current direction */
-    vector_real_mul(direction,dimension,1/linesearch_gamma,residual);
+    vector_copy(direction,residual,dimension);
+    vector_real_mul(residual,dimension,1/linesearch_gamma);
 
     proximal_gradient_descent_push(); /* swap data fields to FBE calculation fields */
     return SUCCESS;
@@ -174,7 +178,9 @@ int proximal_gradient_descent_get_new_residual_buffered(real_t* residual){
     proximal_gradient_descent_push(); /* swap data fields to FBE calculation fields */
 
     /* calculate the residual, as in normalize the current direction */
-    vector_real_mul(direction,dimension,1/linesearch_gamma,residual);
+    vector_copy(direction,residual,dimension);
+    vector_real_mul(residual,dimension,1/linesearch_gamma);
+
 
     proximal_gradient_descent_push(); /* swap data fields to FBE calculation fields */
     return SUCCESS;
@@ -185,7 +191,9 @@ int proximal_gradient_descent_get_new_residual_buffered(real_t* residual){
  */
 int proximal_gradient_descent_get_current_residual(real_t* residual){
     /* calculate the residual, as in normalize the current direction */
-    vector_real_mul(direction,dimension,1/linesearch_gamma,residual);
+    vector_copy(direction,residual,dimension);
+    vector_real_mul(residual,dimension,1/linesearch_gamma);
+
 
     /* calculate the inf-norm and safe it */
     last_current_residual_inf_norm=vector_norm_inf(residual,dimension);
