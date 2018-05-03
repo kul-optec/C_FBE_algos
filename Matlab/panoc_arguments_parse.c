@@ -16,8 +16,14 @@ static int set_problem_parameter(const char* propertie_name,const mxArray* data,
         if (mxIsScalar(data))
             problem->dimension = (int)(mxGetScalar(data) + 0.5); /* make sure it rounds down to the right value*/
 
-    if (strcmp(propertie_name, "constraint_type") == 0)
-        constraint_mode = BOX_MODE;/* at the moment only one constraint so no need to check for now */
+    if (strcmp(propertie_name, "constraint_type") == 0){
+        const char* mode_name = mxArrayToString(data);
+        if(strcmp(mode_name, "box") == 0)
+            constraint_mode = BOX_MODE;
+        if(strcmp(mode_name, "costum") == 0)
+            constraint_mode = COSTUM_CONSTRAINT_MODE;
+    }
+        
 
     return SUCCESS;
 }

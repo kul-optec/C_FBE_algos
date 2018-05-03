@@ -30,10 +30,21 @@ static struct optimizer_problem* problem;
 /* initiaze the indicator box function */
 static int init_solver_box(const mxArray* mx_struct_problem);
 
+static int init_solver_costum_constraint(const mxArray* mx_struct_problem);
+
 /* callback function of the cost/gradient */
 double callback_cost_gradient_function(double* input,double* output);
 
+/* 
+ * callback function of the constraint function g/proxg 
+ * -> returns value g(x) 
+ * -> saves proxg(x) in proxg_x
+ */
+double callback_proxg(double* x);
+
 static mxArray* function_handle;
+static mxArray* function_handle_constraint;/* only used with costum constraint */
+
 /* 
  * The gateway function 
  *  nlhs  :  Number of output (left-side) arguments, or the size of the plhs array.
@@ -61,6 +72,8 @@ void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
         const mxArray* mx_struct_problem = prhs[1];
         if (parser_get_constraint_mode() == BOX_MODE)
             init_solver_box(mx_struct_problem);
+        if (parser_get_constraint_mode() == COSTUM_CONSTRAINT_MODE)
+            init_solver_costum_constraint(mx_struct_problem);
 
         break;
     case SOLVE_MODE:
@@ -79,6 +92,24 @@ void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
         break;
     }
 
+}
+static int init_solver_costum_constraint(const mxArray* mx_struct_problem){
+    /* Loop over all problem related fields, get the values that are only relevant to the constraint*/
+    int number_of_fields_problem = mxGetNumberOfFields(mx_struct_problem);
+    mwIndex  field_number;
+    for (field_number = 0; field_number < number_of_fields_problem; field_number++) {
+        const char* name = mxGetFieldNameByNumber(mx_struct_problem, field_number); /* get name */
+        mxArray* data = mxGetField(mx_struct_problem, FIRST_ELEMENT_INDEX, name); /* get data */
+
+        /* set the right value if it's relevant */
+        if (strcmp(name, "constraint") == 0)
+            function_handle_constraint =(mxArray*) (data); /* get the function handle */
+            
+    }
+    
+    optimizer_init_with_costum_constraint(problem,callback_proxg);
+    
+    return SUCCESS;
 }
 /*
  * Find box constraint specific parameters and call the right init function.
@@ -134,4 +165,33 @@ double callback_cost_gradient_function(const double* input, double* output) {
         output[i] = gradient[i];
 
     return cost[0];/* return the cost by value*/
+}
+
+double callback_proxg(double* input){
+    mwSize ONE = 1;
+    mwSize DIMENSION = problem->dimension;
+    
+    mxArray* mx_input_matlab[2];
+    mx_input_matlab[0] = function_handle_constraint;
+    mx_input_matlab[1] = mxCreateDoubleMatrix(DIMENSION, ONE, mxREAL);
+
+    mxArray* mx_output_matlab[2];
+    
+    /* set the input values */
+    double* input_matlab = mxGetPr(mx_input_matlab[1]);
+    int i;
+    for (i = 0; i < problem->dimension; i++)
+        input_matlab[i] = input[i];
+    
+    /* call the cost/gradient function handle from MATLAB */
+    int state = mexCallMATLAB(2, mx_output_matlab, 2, mx_input_matlab, "feval");
+    
+    /* get the data from the MATLAB matrices */
+    double* proxg = mxGetPr(mx_output_matlab[0]);
+    double g = mxGetScalar(mx_output_matlab[1]);
+    
+    for (i = 0; i < problem->dimension; i++)
+        input[i] = proxg[i];
+    
+    return g;
 }

@@ -14,5 +14,6 @@
 
     /* constraint modes */
     #define BOX_MODE 1
+    #define COSTUM_CONSTRAINT_MODE 2 
 
 #endif

@@ -10,6 +10,7 @@
 #include "constraint_functions.h"
 
 #define INDICATOR_BOX_SQUARED 0
+#define COSTUM_MODE 1
 
 static struct optimizer_problem* problem; /* data related to the problem */
 static struct indicator_box_square_function* indicator_box_square_function_data; /* data related to the constraints used by the prox operator */
@@ -72,11 +73,31 @@ static int optimizer_init(void){
     return SUCCESS;
 }
 
+int optimizer_init_with_costum_constraint(struct optimizer_problem* problem_,real_t (*proxg)(real_t* x)){
+    mode=COSTUM_MODE;
+    problem=problem_;
+
+    /* prepare proxg(x) */
+    problem->proxg=proxg;
+
+    if(optimizer_init()==FAILURE) goto fail_1;
+
+    new_solution = malloc(sizeof(real_t)*problem->dimension);
+    if(new_solution==NULL) goto fail_2;
+
+    return SUCCESS;
+
+    fail_2:
+        optimizer_cleanup();        
+    fail_1:
+        return FAILURE;
+}
+
 int optimizer_init_with_box(struct optimizer_problem* problem_,real_t lower_bound,real_t upper_bound){
     mode=INDICATOR_BOX_SQUARED;
     problem=problem_;    
 
-    /* prepare  g(x) and proxg(x) */
+    /* prepare proxg(x) */
     constraint_functions_init_box(&indicator_box_square_function_data,problem->dimension,lower_bound,upper_bound);
     if(indicator_box_square_function_data==NULL) goto fail_1;
     problem->proxg=indicator_box_square_function_data->proxg;

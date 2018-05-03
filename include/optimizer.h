@@ -16,13 +16,19 @@ struct optimizer_problem{
 };
 
 /*
- * This interfaces a optimization problem onto the panoc algorithm
+ * This interfaces a optimization problem onto the panoc algorithm:
  *      min cost(x)
  *          subject to  L<x<H
  */
 int optimizer_init_with_box(struct optimizer_problem* problem,real_t lower_bound,real_t upper_bound);
-int optimizer_cleanup(void);
+/*
+ * This interfaces a optimization problem onto the panoc algorithm:
+ *      min cost(x)
+ *          subject to  g(x)=0
+ */
+int optimizer_init_with_costum_constraint(struct optimizer_problem* problem_,real_t (*proxg)(real_t* x));
 
+int optimizer_cleanup(void);
 int solve_problem(real_t* solution);
 
 #endif

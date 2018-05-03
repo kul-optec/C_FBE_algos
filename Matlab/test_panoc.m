@@ -1,13 +1,12 @@
 clear all;
 %%
 addpath(genpath('../Matlab'));
-mex panoc.c panoc_arguments_check.c panoc_arguments_parse.c PANOC_lib.lib
+% mex panoc.c panoc_arguments_check.c panoc_arguments_parse.c PANOC_lib.lib
 %%
 problem.dimension = 2;
 problem.constraint_type = 'box';
 problem.upper_bound=4;
 problem.lower_bound=-4;
-problem.cost_function='rosen';
 
 solver_params.tolerance = 1e-12;
 solver_params.buffer_size = 20;
