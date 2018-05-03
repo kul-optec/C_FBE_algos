@@ -239,7 +239,6 @@ real_t proximal_gradient_descent_get_current_forward_backward_envelop(void){
  * calculate the forward backward envelop using internal forwardbackward step
  */
 static real_t proximal_gradient_descent_forward_backward_envelop_precomputed_step(const real_t f_location,const real_t* df_location){
-    // g_new_location=function_evaluator_g(new_location);
     const real_t norm_direction = inner_product(direction,direction,dimension);
 
     const real_t forward_backward_envelop = f_location + g_new_location \
