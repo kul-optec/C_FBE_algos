@@ -89,7 +89,7 @@ real_t g_1(const real_t* x){
     if(potential_x>0)return potential_x;
     return 0;
 }
-void proxg_1(real_t* x){
+real_t proxg_1(real_t* x){
     real_t norm_x = vector_norm1(x,problem1_dimension);
     if(norm_x<problem1_w){/* |x|<w -> sign(x)*(|x|-w)*/
         vector_copy(x,x,problem1_dimension);
@@ -100,6 +100,7 @@ void proxg_1(real_t* x){
         unsigned int i;
         for ( i = 0; i < problem1_dimension; i++)x[i]=sign(x[i])*problem1_w; 
     }
+    return g_1(x);
 }
 
 
@@ -110,7 +111,7 @@ real_t g_2(const real_t* x){
     if(*x==0)return 0;
     return LARGE;
 }
-void proxg_2(real_t* x){
+real_t proxg_2(real_t* x){
     if(*x<-0.5){
         *x= -1;
     }else if (*x>0.5){
@@ -118,6 +119,7 @@ void proxg_2(real_t* x){
     }else{
         *x= 0;
     }
+    return g_2(x);
 }
 
 static real_t problem3_u_min=0;
@@ -134,11 +136,13 @@ real_t g_3(const real_t* x){
     if(*x<-problem3_u_min && *x>-problem3_u_max)return 0;
     return LARGE;
 }
-void proxg_3(real_t* x){
+real_t proxg_3(real_t* x){
     if(*x>problem3_u_min && *x<problem3_u_max)*x = *x;
     if(*x<-problem3_u_min && *x>-problem3_u_max)*x = *x;
     if(*x>problem3_u_max) *x = problem3_u_max;
     if(*x<-problem3_u_max) *x = -problem3_u_max;
     if(*x>0)*x =problem3_u_min;
     else *x =-problem3_u_min;
+
+    return g_3(x);
 }

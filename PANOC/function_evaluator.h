@@ -16,6 +16,6 @@ int function_evaluator_cleanup(void);
  */
 real_t function_evaluator_f_df(const real_t* input,real_t* output);
 real_t function_evaluator_g(const real_t* input);
-void function_evaluator_proxg(real_t* input);
+real_t function_evaluator_proxg(real_t* input);
 
 #endif

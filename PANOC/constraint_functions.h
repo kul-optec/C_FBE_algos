@@ -7,8 +7,7 @@ struct indicator_box_square_function{
     unsigned int dimension;
     real_t lower_bound;
     real_t upper_bound;
-    real_t (*g)(const real_t* input);
-    void (*proxg)(real_t* input);
+    real_t (*proxg)(real_t* input);
     real_t inf;
 };
 

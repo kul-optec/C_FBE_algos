@@ -4,7 +4,7 @@
 
 static struct indicator_box_square_function* indicator_box_square_function_data;
 static real_t g_indicator_box_square_function(const real_t* input);
-static void proxg_indicator_box_square_function(real_t* input);
+static real_t proxg_indicator_box_square_function(real_t* input);
 
 int constraint_functions_init_box(struct indicator_box_square_function** box_function,\
                                     unsigned int dimension_,real_t lower_bound,real_t upper_bound){
@@ -15,7 +15,6 @@ int constraint_functions_init_box(struct indicator_box_square_function** box_fun
     indicator_box_square_function_data = *box_function;
 
     indicator_box_square_function_data->dimension=dimension_;
-    indicator_box_square_function_data->g=g_indicator_box_square_function;
     indicator_box_square_function_data->proxg=proxg_indicator_box_square_function;
     indicator_box_square_function_data->lower_bound=lower_bound;
     indicator_box_square_function_data->upper_bound=upper_bound;
@@ -43,7 +42,7 @@ static real_t g_indicator_box_square_function(const real_t* input){
     return 0;
 }
 
-static void proxg_indicator_box_square_function(real_t* input){
+static real_t proxg_indicator_box_square_function(real_t* input){
     unsigned int i;
     for (i = 0; i < indicator_box_square_function_data->dimension; i++)
     {
@@ -56,4 +55,5 @@ static void proxg_indicator_box_square_function(real_t* input){
             input[i]=indicator_box_square_function_data->upper_bound;
         }
     }
+    return g_indicator_box_square_function(input);
 }

@@ -8,7 +8,6 @@
 /* squared with preprocessor */
 #define sq(x) ((x)*(x))
 
-
 /* copy vector1 into vector2 */
 void vector_copy(const real_t* vector1,real_t* vector2,const int size_vector);
 

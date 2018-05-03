@@ -80,7 +80,6 @@ int optimizer_init_with_box(struct optimizer_problem* problem_,real_t lower_boun
     constraint_functions_init_box(&indicator_box_square_function_data,problem->dimension,lower_bound,upper_bound);
     if(indicator_box_square_function_data==NULL) goto fail_1;
     problem->proxg=indicator_box_square_function_data->proxg;
-    problem->g=indicator_box_square_function_data->g;
 
     if(optimizer_init()==FAILURE) goto fail_2;
 
