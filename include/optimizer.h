@@ -16,6 +16,11 @@ struct optimizer_problem{
 };
 
 /*
+ * Initializes a optimizer that uses the PANOC algorithm.
+ */
+int optimizer_init(struct optimizer_problem* problem_);
+
+/*
  * This interfaces a optimization problem onto the panoc algorithm:
  *      min cost(x)
  *          subject to  L<x<H
