@@ -145,7 +145,7 @@ static int proximal_gradient_descent_forward_backward_step(const real_t* locatio
     vector_copy(location,new_location,dimension);
     vector_add_ntimes(new_location,df_location,dimension,-1*linesearch_gamma); /* new_location = location - gamma * df_location */
     
-    g_new_location = function_evaluator_proxg(new_location); /* new_location = proxg(new_location) */
+    g_new_location = function_evaluator_proxg(new_location,linesearch_gamma); /* new_location = proxg(new_location) */
     
     vector_copy(location,direction,dimension); /* find the direction */
     vector_add_ntimes(direction,new_location,dimension,-1.);

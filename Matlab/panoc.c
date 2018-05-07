@@ -14,14 +14,14 @@
 
 #include "mex.h"
 #include "matrix.h"
-#include"stdio.h"
-#include"stdlib.h"
+#include "stdio.h"
+#include "stdlib.h"
 #include <string.h>
 
-#include"../include/optimizer.h"
+#include "../include/optimizer.h"
 
-#include"panoc.h"
-#include"panoc_arguments_check.h"
+#include "panoc.h"
+#include "panoc_arguments_check.h"
 #include "panoc_arguments_parse.h"
 
 /* read out parameters and set the optimizer_problem struct */ 
@@ -40,7 +40,7 @@ double callback_cost_gradient_function(double* input,double* output);
  * -> returns value g(x) 
  * -> saves proxg(x) in proxg_x
  */
-double callback_proxg(double* x);
+double callback_proxg(double* x,  double gamma);
 
 static mxArray* function_handle;
 static mxArray* function_handle_constraint;/* only used with costum constraint */
@@ -167,13 +167,14 @@ double callback_cost_gradient_function(const double* input, double* output) {
     return cost[0];/* return the cost by value*/
 }
 
-double callback_proxg(double* input){
+double callback_proxg(double* input, double gamma){
     mwSize ONE = 1;
     mwSize DIMENSION = problem->dimension;
     
-    mxArray* mx_input_matlab[2];
+    mxArray* mx_input_matlab[3];
     mx_input_matlab[0] = function_handle_constraint;
     mx_input_matlab[1] = mxCreateDoubleMatrix(DIMENSION, ONE, mxREAL);
+    mx_input_matlab[2] = mxCreateDoubleScalar(gamma);
 
     mxArray* mx_output_matlab[2];
     
@@ -184,7 +185,7 @@ double callback_proxg(double* input){
         input_matlab[i] = input[i];
     
     /* call the cost/gradient function handle from MATLAB */
-    int state = mexCallMATLAB(2, mx_output_matlab, 2, mx_input_matlab, "feval");
+    int state = mexCallMATLAB(2, mx_output_matlab, 3, mx_input_matlab, "feval");
     
     /* get the data from the MATLAB matrices */
     double* proxg = mxGetPr(mx_output_matlab[0]);

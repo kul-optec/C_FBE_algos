@@ -7,7 +7,7 @@
 #include<stdio.h>
 
 #include "../include/optimizer.h"
-#include "constraints/constraint_functions.h"
+
 
 static struct optimizer_problem* problem; /* data related to the problem */
 static unsigned char initialized=FALSE;
@@ -78,10 +78,10 @@ int optimizer_init(struct optimizer_problem* problem_){
         return FAILURE;
 }
 
-int optimizer_init_with_costum_constraint(struct optimizer_problem* problem_,real_t (*proxg)(real_t* x)){
+int optimizer_init_with_costum_constraint(struct optimizer_problem* problem_,real_t (*proxg)(real_t* x, real_t gamma)){
 
     /* prepare proxg(x) */
-    problem->proxg=proxg;
+    problem_->proxg = proxg;
 
     if(optimizer_init(problem_)==FAILURE) return FAILURE;
 

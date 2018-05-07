@@ -14,7 +14,7 @@
 static real_t* constraint_weights;
 static const real_t* state;
 
-static int number_of_constraints;
+static unsigned int number_of_constraints;
 
 int casadi_interface_init(const int number_of_constraints_){
     number_of_constraints = number_of_constraints_;
@@ -22,7 +22,7 @@ int casadi_interface_init(const int number_of_constraints_){
         constraint_weights=malloc(sizeof(real_t)*number_of_constraints);
         if(constraint_weights==NULL) goto fail_1;
         else{
-            size_t i;
+            unsigned int i;
             for (i = 0; i < number_of_constraints; i++){
                 constraint_weights[i]=DEFAULT_CONSTRAINT_WEIGHT;
             }

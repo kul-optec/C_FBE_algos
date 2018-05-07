@@ -15,6 +15,6 @@ int function_evaluator_cleanup(void);
  * returns the gradient in real_t* output
  */
 real_t function_evaluator_f_df(const real_t* input,real_t* output);
-real_t function_evaluator_proxg(real_t* input);
+real_t function_evaluator_proxg(real_t* input, real_t gamma);
 
 #endif

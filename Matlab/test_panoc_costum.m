@@ -7,7 +7,7 @@ problem.constraint_type = 'costum';
 
 upper_bound = 4;
 lower_bound = -4;
-g = @(x) indBox(x,upper_bound,lower_bound);
+g = @(x,gamma) indBox_manual(x,upper_bound,lower_bound,gamma);
 problem.constraint = g;
 
 solver_params.tolerance = 1e-12;
@@ -19,8 +19,8 @@ solution = [0;0];
 panoc('init',problem,solver_params);
 number_of_iterations = panoc('solve',solution,@rosen);
 panoc('cleanup');
-
-function [proxg,g] = indBox(x,upper_bound,lower_bound)
+%%
+function [proxg,g] = indBox_manual(x,upper_bound,lower_bound,gamma)
     % indicator box fuction
     proxg = min(upper_bound, max(lower_bound, x));
     g = 0;

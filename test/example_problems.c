@@ -89,7 +89,7 @@ real_t g_1(const real_t* x){
     if(potential_x>0)return potential_x;
     return 0;
 }
-real_t proxg_1(real_t* x){
+real_t proxg_1(real_t* x, real_t gamma){
     real_t norm_x = vector_norm1(x,problem1_dimension);
     if(norm_x<problem1_w){/* |x|<w -> sign(x)*(|x|-w)*/
         vector_copy(x,x,problem1_dimension);
@@ -111,7 +111,7 @@ real_t g_2(const real_t* x){
     if(*x==0)return 0;
     return LARGE;
 }
-real_t proxg_2(real_t* x){
+real_t proxg_2(real_t* x, real_t gamma){
     if(*x<-0.5){
         *x= -1;
     }else if (*x>0.5){
@@ -136,7 +136,7 @@ real_t g_3(const real_t* x){
     if(*x<-problem3_u_min && *x>-problem3_u_max)return 0;
     return LARGE;
 }
-real_t proxg_3(real_t* x){
+real_t proxg_3(real_t* x, real_t gamma){
     if(*x>problem3_u_min && *x<problem3_u_max)*x = *x;
     if(*x<-problem3_u_min && *x>-problem3_u_max)*x = *x;
     if(*x>problem3_u_max) *x = problem3_u_max;

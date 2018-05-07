@@ -43,7 +43,7 @@ int test_rosen_box(void){
     return SUCCESS;
 }
 
-static real_t costum_proxg(real_t* x){
+static real_t costum_proxg(real_t* x, real_t gamma){
     real_t lower_bound = -2;
     real_t upper_bound = 2;
     real_t g_x=0;

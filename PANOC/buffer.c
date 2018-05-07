@@ -6,8 +6,6 @@
 
 static const real_t* current_location;
 
-static unsigned int dimension;
-
 static real_t current_f;
 static real_t* current_df;
 
@@ -31,8 +29,6 @@ int buffer_init(unsigned int dimension_problem){
 
     pure_prox_location_df=malloc(sizeof(real_t)*dimension_problem);
     if(pure_prox_location_df==NULL) goto fail_3;
-
-    dimension = dimension_problem;
     
     return SUCCESS;
     fail_3:
