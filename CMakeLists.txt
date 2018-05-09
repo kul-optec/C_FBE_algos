@@ -9,11 +9,12 @@ project (panoc C)
 
 # set the compiler with its flags
 # SET(CMAKE_C_COMPILER gcc)
-SET(CMAKE_BUILD_TYPE Debug)
-if(NOT MSVC)
-    set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -fprofile-arcs -ftest-coverage")
-    set(LDFLAGS "-O0 -fprofile-arcs -ftest-coverage")
-    SET(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+    if(NOT MSVC)
+        set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -fprofile-arcs -ftest-coverage")
+        set(LDFLAGS "-O0 -fprofile-arcs -ftest-coverage")
+        SET(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+    endif()
 endif()
 
 # subdirectories with libraries

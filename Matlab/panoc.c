@@ -33,7 +33,7 @@ static int init_solver_box(const mxArray* mx_struct_problem);
 static int init_solver_costum_constraint(const mxArray* mx_struct_problem);
 
 /* callback function of the cost/gradient */
-double callback_cost_gradient_function(double* input,double* output);
+double callback_cost_gradient_function(const double* input,double* output);
 
 /* 
  * callback function of the constraint function g/proxg 
@@ -55,41 +55,41 @@ static mxArray* function_handle_constraint;/* only used with costum constraint *
 void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
 {
     const int mode = check_input_arguments(nrhs, prhs);
-    switch (mode)
-    {
-    case INIT_MODE:
-        problem = malloc(sizeof(struct optimizer_problem));
-        if (problem == NULL) {
-            mexErrMsgTxt("Cannot allocate problem struct, not enough heap memory available"); 
+    switch (mode){
+        case INIT_MODE :
+            problem = malloc(sizeof(struct optimizer_problem));
+            if (problem == NULL) {
+                mexErrMsgTxt("Cannot allocate problem struct, not enough heap memory available"); 
+                break;
+            }
+            parse_problem(prhs,problem);
+            parse_solver(prhs,problem);
+
+            /* set the cost/gradient function to the callback function */
+            problem->cost_gradient_function = callback_cost_gradient_function;
+
+            const mxArray* mx_struct_problem = prhs[1];
+            if (parser_get_constraint_mode() == BOX_MODE)
+                init_solver_box(mx_struct_problem);
+            if (parser_get_constraint_mode() == COSTUM_CONSTRAINT_MODE)
+                init_solver_costum_constraint(mx_struct_problem);
+
             break;
-        }
-        parse_problem(prhs,problem);
-        parse_solver(prhs,problem);
-
-        /* set the cost/gradient function to the callback function */
-        problem->cost_gradient_function = callback_cost_gradient_function;
-
-        const mxArray* mx_struct_problem = prhs[1];
-        if (parser_get_constraint_mode() == BOX_MODE)
-            init_solver_box(mx_struct_problem);
-        if (parser_get_constraint_mode() == COSTUM_CONSTRAINT_MODE)
-            init_solver_costum_constraint(mx_struct_problem);
-
-        break;
-    case SOLVE_MODE:
-        double* init_solution = mxGetPr(prhs[1]);
-        function_handle =(mxArray*) (prhs[2]); /* get the function handle */
-        
-        int number_of_iterations = solve_problem(init_solution);
-        if(nlhs>0) plhs[0] = mxCreateDoubleScalar(number_of_iterations);
-        break;
-    case CLEANUP_MODE:
-        if (problem!=NULL) free(problem);
-        optimizer_cleanup();
-        break;
-    default:
-        mexErrMsgTxt("error invalid mode");
-        break;
+        case SOLVE_MODE : 
+	    ;
+            double* init_solution = mxGetPr(prhs[1]);
+            function_handle =(mxArray*) (prhs[2]); /* get the function handle */
+            
+            int number_of_iterations = solve_problem(init_solution);
+            if(nlhs>0) plhs[0] = mxCreateDoubleScalar(number_of_iterations);
+            break;
+        case CLEANUP_MODE :
+            if (problem!=NULL) free(problem);
+            optimizer_cleanup();
+            break;
+        default :
+            mexErrMsgTxt("error invalid mode");
+            break;
     }
 
 }

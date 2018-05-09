@@ -19,9 +19,3 @@ solution = [0;0];
 panoc('init',problem,solver_params);
 number_of_iterations = panoc('solve',solution,@rosen);
 panoc('cleanup');
-%%
-function [proxg,g] = indBox_manual(x,upper_bound,lower_bound,gamma)
-    % indicator box fuction
-    proxg = min(upper_bound, max(lower_bound, x));
-    g = 0;
-end
