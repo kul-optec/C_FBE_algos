@@ -13,6 +13,9 @@
     #define real_t double
     /* data types have different absolute value functions */ 
     #define ABS(x) fabs(x)
+    #define MAX(x,y) fmax(x,y)
+    #define MIN(x,y) fmin(x,y)
+
     /* Machine accuracy of IEEE double */ 
     #define MACHINE_ACCURACY DBL_EPSILON
     /* large number use with things like indicator functions */ 

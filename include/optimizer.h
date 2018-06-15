@@ -15,8 +15,17 @@ struct optimizer_problem{
     struct solver_parameters solver_params;
 };
 
+struct optimizer_extended_problem{
+    struct optimizer_problem problem;
+    real_t (**h)(const real_t* x,real_t* dh);
+    unsigned int number_of_constraints;
+    real_t* lower_bounds_constraints;
+    real_t* upper_bounds_constraints;
+    unsigned int number_of_iterations;
+};
+
 /*
- * Initializes a optimizer that uses the PANOC algorithm.
+ * Initializes a optimizer that makes use of the PANOC algorithm.
  */
 int optimizer_init(struct optimizer_problem* problem_);
 
@@ -26,6 +35,7 @@ int optimizer_init(struct optimizer_problem* problem_);
  *          subject to  L<x<H
  */
 int optimizer_init_with_box(struct optimizer_problem* problem,real_t lower_bound,real_t upper_bound);
+
 /*
  * This interfaces a optimization problem onto the panoc algorithm:
  *      min cost(x)
@@ -33,7 +43,19 @@ int optimizer_init_with_box(struct optimizer_problem* problem,real_t lower_bound
  */
 int optimizer_init_with_costum_constraint(struct optimizer_problem* problem_,real_t (*proxg)(real_t* x, real_t gamma));
 
+/*
+ * This interfaces the format of the casadi library onto the panoc algorithm:
+ *      min cost(x)
+ *          subject to  hmin < h(x) < hmax
+ *                      xmin <  x   < xmax
+ *      weight : weight of the constraints h(x)
+ */
+int optimizer_init_extended_box(struct optimizer_extended_problem* extended_problem,real_t lower_bound,real_t upper_bound,real_t constraint_weight_);
+
 int optimizer_cleanup(void);
+int optimizer_cleanup_extended(void);
+
 int solve_problem(real_t* solution);
+int solve_extended_problem(real_t* solution);
 
 #endif
