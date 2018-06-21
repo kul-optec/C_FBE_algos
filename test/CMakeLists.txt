@@ -26,3 +26,10 @@ if(NOT MSVC) # Microsoft Visual studio doesn't like this
     target_link_libraries(panoc_test m) # link with the math lib, some toolchains need this
 endif()
 target_link_libraries(panoc_test problem_set)
+
+add_executable(panoc_extended panoc_extended.c)
+target_link_libraries (panoc_extended PANOC_lib)
+if(NOT MSVC) # Microsoft Visual studio doesn't like this
+    target_link_libraries(panoc_extended m) # link with the math lib, some toolchains need this
+endif()
+target_link_libraries(panoc_extended problem_set)

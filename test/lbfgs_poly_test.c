@@ -13,12 +13,12 @@
 #define DIMENSION 2
 static const real_t theoretical_solution[]={0,0};
 static int degree=10;
-int checkIfSolutionIsReached(void);
-int check2thdegreepolynomial(void);
-int rosenbrock_test(void);
+static int checkIfSolutionIsReached(void);
+static int check2thdegreepolynomial(void);
+static int rosenbrock_test(void);
 
-void print_location(const real_t* location);
-void print_diff(const real_t* location,const real_t* solution);
+static void print_location(const real_t* location);
+static void print_diff(const real_t* location,const real_t* solution);
 
 /*
  * TEST lbfgs
@@ -31,7 +31,7 @@ int main(){
     rosenbrock_test(); 
 }
 
-int checkIfSolutionIsReached(void){
+static int checkIfSolutionIsReached(void){
     printf("test1 --- \n");
     degree=10;
     size_t buffer_size =20;
@@ -73,7 +73,7 @@ int checkIfSolutionIsReached(void){
     }
 }
 
-int check2thdegreepolynomial(void){
+static int check2thdegreepolynomial(void){
     degree=2;
     size_t buffer_size =10;
 
@@ -111,7 +111,7 @@ int check2thdegreepolynomial(void){
         return FAILURE;
     }
 }
-real_t backtracking_linesearch(const real_t* direction,const real_t* location){
+static real_t backtracking_linesearch(const real_t* direction,const real_t* location){
     /* do backtracking linesearch */
     real_t current_df[DIMENSION];
     df_rosenbrock(location,current_df);
@@ -132,7 +132,7 @@ real_t backtracking_linesearch(const real_t* direction,const real_t* location){
     }
     return alpha;
 }
-int rosenbrock_test(void){
+static int rosenbrock_test(void){
     degree=2;
     size_t buffer_size = 20;
 
@@ -173,9 +173,9 @@ int rosenbrock_test(void){
     }
 }
 
-void print_location(const real_t* location){
+static void print_location(const real_t* location){
     printf("x1=%f x2=%f with cost=%1.16f \n",location[0],location[1],f_poly(location));
 }
-void print_diff(const real_t* location,const real_t* solution){
+static void print_diff(const real_t* location,const real_t* solution){
     printf("difference -> x1=%f x2=%f with cost=%1.16f \n",ABS(location[0]-solution[0]),ABS(location[1]-solution[1]),f_poly(location));
 }

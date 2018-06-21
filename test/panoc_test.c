@@ -5,15 +5,15 @@
 #include"example_problems.h"
 #include"../include/optimizer.h"
 
-int test_rosen_box(void);
-int test_rosen_costum_box();
-real_t rosen_cost_gradient(const real_t* input,real_t* output);
+static int test_rosen_box(void);
+static int test_rosen_costum_box();
+static real_t rosen_cost_gradient(const real_t* input,real_t* output);
 
 int main(){
     return test_rosen_box()+test_rosen_costum_box();
 }
 
-int test_rosen_box(void){
+static int test_rosen_box(void){
     real_t lower_bound = -2;
     real_t upper_bound = 2;
 
@@ -64,7 +64,7 @@ static real_t costum_proxg(real_t* x, real_t gamma){
     return g_x;
 }
 
-int test_rosen_costum_box(void){
+static int test_rosen_costum_box(void){
     struct optimizer_problem problem;
     problem.cost_gradient_function=rosen_cost_gradient;
     problem.dimension=2;
@@ -90,7 +90,7 @@ int test_rosen_costum_box(void){
     optimizer_cleanup();
     return SUCCESS;
 }
-real_t rosen_cost_gradient(const real_t* input,real_t* output){
+static real_t rosen_cost_gradient(const real_t* input,real_t* output){
     df_rosenbrock(input,output);
     return f_rosenbrock(input);
 }

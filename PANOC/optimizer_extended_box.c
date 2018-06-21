@@ -89,12 +89,12 @@ int solve_extended_problem(real_t* solution){
     unsigned i;
 
     /* init the slack variables to zero */
-    for (i = 0; i < extended_problem->number_of_iterations; i++){
+    for (i = 0; i < extended_problem->number_of_constraints; i++){
         lagrangian_multipliers[i]=0;
     }
 
     int interations_till_convergence = 0;
-    for( i = 0; i < extended_problem->problem.solver_params.max_interations; i++){
+    for( i = 0; i < extended_problem->number_of_iterations; i++){
         
         /* solve the problem with the current slack variables */
         interations_till_convergence += solve_problem(solution);
@@ -129,7 +129,7 @@ static real_t compute_constraint_part_LA(const real_t* x,real_t* output_gradient
     for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
 
         /* evaluate constraint */
-        constraint_evaluations[index_constraint]=extended_problem->h[index_constraint](x,gradient_constraint);
+        constraint_evaluations[index_constraint]=extended_problem->constraints[index_constraint](x,gradient_constraint);
 
         /* calculate the violation */
         slacked_constraint_violations[index_constraint] = MIN(extended_problem->upper_bounds_constraints[index_constraint],\
@@ -150,7 +150,7 @@ static real_t compute_constraint_part_LA(const real_t* x,real_t* output_gradient
 static int compute_lagrangian_multipliers(real_t* new_x){
     unsigned int index_constraint;
     for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
-        real_t constraint_evaluation = extended_problem->h[index_constraint](new_x,gradient_constraint);/* evaluate constraint in new position */
+        real_t constraint_evaluation = extended_problem->constraints[index_constraint](new_x,gradient_constraint);/* evaluate constraint in new position */
 
         lagrangian_multipliers[index_constraint] = lagrangian_multipliers[index_constraint] + constraint_weight*(constraint_evaluation - lagrangian_multipliers[index_constraint]);
     }

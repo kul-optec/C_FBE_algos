@@ -17,7 +17,7 @@ struct optimizer_problem{
 
 struct optimizer_extended_problem{
     struct optimizer_problem problem;
-    real_t (**h)(const real_t* x,real_t* dh);
+    real_t (**constraints)(const real_t* x,real_t* dh);
     unsigned int number_of_constraints;
     real_t* lower_bounds_constraints;
     real_t* upper_bounds_constraints;
