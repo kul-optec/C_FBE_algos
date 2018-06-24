@@ -80,6 +80,7 @@ static int test(void){
     /*
      * set PANOC related values
      */
+    extended_problem.max_loops=10;
     extended_problem.problem.solver_params.tolerance=1e-12;
     extended_problem.problem.solver_params.buffer_size=20;
     extended_problem.problem.solver_params.max_interations=200;

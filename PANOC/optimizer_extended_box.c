@@ -94,7 +94,7 @@ int solve_extended_problem(real_t* solution){
     }
 
     int interations_till_convergence = 0;
-    for( i = 0; i < extended_problem->number_of_iterations; i++){
+    for( i = 0; i < extended_problem->max_loops; i++){
         
         /* solve the problem with the current slack variables */
         interations_till_convergence += solve_problem(solution);

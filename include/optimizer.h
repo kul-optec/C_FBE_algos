@@ -21,7 +21,7 @@ struct optimizer_extended_problem{
     unsigned int number_of_constraints;
     real_t* lower_bounds_constraints;
     real_t* upper_bounds_constraints;
-    unsigned int number_of_iterations;
+    unsigned int max_loops;
 };
 
 /*
