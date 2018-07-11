@@ -22,30 +22,26 @@ int main(){
  * (copied from Joris Gillis, 2018, Casadi)
 */ 
 
-/*
- * function used in constraint 
- * h(x,y) = cos(x+y)+0.5
- * dh(x,y)/dx = -sin(x+y)
- * dh(x,y)/dy = -sin(x+y)
- */
-static real_t constraint_1(const real_t* x,real_t* gradient){
-    gradient[0]=-sin(x[0]+x[1]);
-    gradient[1]=-sin(x[0]+x[1]);
 
-    return cos(x[0]+x[1])+0.5;
+/*
+ * constraints with gradient
+ * h_1(x,y) = cos(x+y)+0.5
+ * dh_1(x,y)/dx = -sin(x+y)
+ * dh_1(x,y)/dy = -sin(x+y)
+ * 
+ * h_2(x,y) = sin(x) + 0.5
+ * dh_2(x,y)/dx = cos(x)
+ * dh_2(x,y)/dy = 0
+ */
+static int constraints(const real_t* x,real_t* out){
+    out[0] = cos(x[0]+x[1])+0.5;
+    out[1] = sin(x[0]) + 0.5;
+
+    return SUCCESS;
 }
-
-/*
- * function used in constraint 
- * h(x,y) = sin(x) + 0.5
- * dh(x,y)/dx = cos(x)
- * dh(x,y)/dy = 0
- */
-static real_t constraint_2(const real_t* x,real_t* gradient){
-    gradient[0]=cos(x[0]);
-    gradient[1]=0;
-
-    return sin(x[0]) + 0.5;
+static real_t constraints_forward_diff(const real_t* x,real_t* y,real_t* out){
+    out[0]=-sin(x[0]+x[1])*y[0]+ -sin(x[0]+x[1])*y[1];
+    out[1]=cos(x[0])*y[0]+0*y[1];
 }
 
 static int test(void){
@@ -54,12 +50,8 @@ static int test(void){
     real_t constraint_weight_= 1;
 
     /*
-     * prepare constraint functions
+     * prepare constraint
      */
-    real_t (*constraints[2])(const real_t* x,real_t* dh);    
-    constraints[0]=constraint_1;
-    constraints[1]=constraint_2;
-
     real_t low_bounds_constraints[2]={0,-INFINITY};
     real_t upper_bounds_constraints[2]={0,0};
     
@@ -76,6 +68,7 @@ static int test(void){
     extended_problem.lower_bounds_constraints=low_bounds_constraints;
     extended_problem.upper_bounds_constraints=upper_bounds_constraints;
     extended_problem.constraints=constraints;
+    extended_problem.constraints_forwad_diff=constraints_forward_diff;
 
     /*
      * set PANOC related values

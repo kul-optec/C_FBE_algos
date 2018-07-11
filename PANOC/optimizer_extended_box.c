@@ -15,7 +15,7 @@ static int compute_lagrangian_multipliers(real_t* new_x);
 static real_t* lagrangian_multipliers;
 static real_t* slacked_constraint_violations; /* The violation of the constraint with it's slack variables */
 static real_t* constraint_evaluations;
-static real_t* gradient_constraint;
+static real_t* buffer_part_constraint;
 
 static real_t (*cost_gradient_function)(const real_t* input,real_t* output_gradient); /* old cost function/gradient */
 static real_t cost_gradient_function_LA(const real_t* input,real_t* output_gradient); /* new cost function/gradient */
@@ -44,8 +44,8 @@ int optimizer_init_extended_box(struct optimizer_extended_problem* extended_prob
     slacked_constraint_violations = malloc(sizeof(real_t)*extended_problem->number_of_constraints);
     if(slacked_constraint_violations==NULL) goto fail_4;
 
-    gradient_constraint = malloc(sizeof(real_t)*extended_problem->problem.dimension);
-    if(gradient_constraint==NULL) goto fail_5;
+    buffer_part_constraint = malloc(sizeof(real_t)*extended_problem->problem.dimension);
+    if(buffer_part_constraint==NULL) goto fail_5;
     
     return SUCCESS;
 
@@ -62,7 +62,7 @@ int optimizer_init_extended_box(struct optimizer_extended_problem* extended_prob
 }
 
 int optimizer_cleanup_extended(void){
-    free(gradient_constraint);
+    free(buffer_part_constraint);
     free(slacked_constraint_violations);
     free(constraint_evaluations);
     free(lagrangian_multipliers);
@@ -76,7 +76,7 @@ static real_t cost_gradient_function_LA(const real_t* input,real_t* output_gradi
     /* fill up output_gradient with the gradient of f */
     real_t buffer =  cost_gradient_function(input,output_gradient);
 
-    /* compute constraint related stuff for this position */
+    /* compute constraint related stuff for this position, do this first output gradient is also used as buffer */
     buffer += compute_constraint_part_LA(input,output_gradient);
    
     return buffer;
@@ -93,7 +93,7 @@ int solve_extended_problem(real_t* solution){
         lagrangian_multipliers[i]=0;
     }
 
-    int interations_till_convergence = 0;
+    unsigned int interations_till_convergence = 0;
     for( i = 0; i < extended_problem->max_loops; i++){
         
         /* solve the problem with the current slack variables */
@@ -106,53 +106,69 @@ int solve_extended_problem(real_t* solution){
 }
 
 /*
- * The gradient of the lagragian is defined as: df(x) + constraint part
- *      constraint part = constraint_weight*(dh(x)*(h(x)+(1/c)*lagrangian_multiplier - z_c(x,lagrangian_multiplier)))
+ * Calculate reusable buffer buffer_part_constraint
+ *      buffer_part_constraint = h(x)+(1/c)*lagrangian_multiplier - z_c(x,lagrangian_multiplier)
  */
-static real_t add_constraint_gradient_part(const real_t constraint_evaluation,const real_t lagrangian_multiplier,\
-        const real_t slacked_constraint_violation, real_t* output_gradient){
+static int compute_buffer_part_constraint(void){
+    unsigned int index_constraint;real_t LA=0;
+    for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
+        buffer_part_constraint[index_constraint]= constraint_evaluations[index_constraint] + \
+             (1/constraint_weight)*lagrangian_multipliers[index_constraint]- \
+             slacked_constraint_violations[index_constraint];        
+    }
 
-    real_t buffer = constraint_evaluation + (1/constraint_weight)*lagrangian_multiplier - slacked_constraint_violation;
+    return SUCCESS;
+}
 
-    /* add the gradient part */
-    vector_add_ntimes(output_gradient,gradient_constraint,extended_problem->problem.dimension,constraint_weight);
+static int compute_slacked_constraint_violations(void){
+    /* calculate the violation */
+    unsigned int index_constraint;
+    for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
+        slacked_constraint_violations[index_constraint] = MIN(extended_problem->upper_bounds_constraints[index_constraint],\
+            MAX(constraint_evaluations[index_constraint],extended_problem->lower_bounds_constraints[index_constraint])\
+        );
+    }
+    return SUCCESS;
+}
+/* LA = c/2 * || buffer_part_constraint ||^2 - 1/(2*c) || Lagrangian_multipliers||^2 */
+static real_t compute_LA_cost(const real_t* output_gradient){
+    return (constraint_weight/2)*inner_product(buffer_part_constraint,buffer_part_constraint,extended_problem->number_of_constraints)\
+        - (1/(2*constraint_weight))*inner_product(lagrangian_multipliers,lagrangian_multipliers,extended_problem->number_of_constraints);
+}
+static int add_LA_gradient(real_t* output_gradient){
+    extended_problem->constraints_forwad_diff(output_gradient,buffer_part_constraint,buffer_part_constraint);
+    vector_add_ntimes(output_gradient,buffer_part_constraint,extended_problem->number_of_constraints,constraint_weight);
 
-    /* return the function part */
-    return sq(buffer)*(constraint_weight/2)-1/(2*constraint_weight)*sq(lagrangian_multiplier); 
+    return SUCCESS;
 }
 
 /*
  * Compute the constraint part of the lagrangian (cost and gradient)
  */
 static real_t compute_constraint_part_LA(const real_t* x,real_t* output_gradient){
-    unsigned int index_constraint;real_t LA=0;
-    for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
+    /* calculate intermediate variables */
+    extended_problem->constraints(x,constraint_evaluations);
+    compute_slacked_constraint_violations();
+    compute_buffer_part_constraint();
+    
+    /* calculate cost and gradient */
+    real_t LA = compute_LA_cost(output_gradient);
+    add_LA_gradient(output_gradient);
 
-        /* evaluate constraint */
-        constraint_evaluations[index_constraint]=extended_problem->constraints[index_constraint](x,gradient_constraint);
-
-        /* calculate the violation */
-        slacked_constraint_violations[index_constraint] = MIN(extended_problem->upper_bounds_constraints[index_constraint],\
-            MAX(constraint_evaluations[index_constraint],extended_problem->lower_bounds_constraints[index_constraint])\
-        );
-
-        /* calculate the gradient part and add it to the current gradient, it returns the cost function */
-        LA += add_constraint_gradient_part(constraint_evaluations[index_constraint], lagrangian_multipliers[index_constraint],\
-            slacked_constraint_violations[index_constraint], output_gradient);
-    }
     return LA;
 }
 
 /*
  * Compute the lagrangian multipliers with the formula
- *     y = y + constraint_weight*(g(new_x)-z_c(x,y))
+ *     y = y + constraint_weight*(g(new_x)-z_c(new_x,y))
  */
 static int compute_lagrangian_multipliers(real_t* new_x){
-    unsigned int index_constraint;
-    for (index_constraint = 0; index_constraint < extended_problem->number_of_constraints; index_constraint++){
-        real_t constraint_evaluation = extended_problem->constraints[index_constraint](new_x,gradient_constraint);/* evaluate constraint in new position */
+    extended_problem->constraints(new_x,constraint_evaluations);
+    compute_slacked_constraint_violations();
 
-        lagrangian_multipliers[index_constraint] = lagrangian_multipliers[index_constraint] + constraint_weight*(constraint_evaluation - lagrangian_multipliers[index_constraint]);
-    }
+    real_t* buffer = buffer_part_constraint; /* reuse this buffer for something else */
+    vector_add_ntimes(constraint_evaluations,slacked_constraint_violations,extended_problem->number_of_constraints,-1.); /* g(x_c) - z_c(x_c,lagrangian_multipliers) */
+    vector_add_ntimes(lagrangian_multipliers,constraint_evaluations,extended_problem->number_of_constraints,constraint_weight);
+
     return SUCCESS;
 }
