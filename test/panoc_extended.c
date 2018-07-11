@@ -87,10 +87,10 @@ static int test(void){
 
     printf("solution in %d iterations = [%f ; %f] \n",iterations,solution[0],solution[1]);
 
-	real_t error = ABS(solution[0] - 1.0);
+	real_t error = ABS(solution[0] - 0.);
     if(error > extended_problem.problem.solver_params.tolerance)
         return FAILURE;
-	error = ABS(solution[1] - 1.0);
+	error = ABS(solution[1] - 0.);
     if(error > extended_problem.problem.solver_params.tolerance)
         return FAILURE;
 
