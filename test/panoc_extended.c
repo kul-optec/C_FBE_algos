@@ -39,9 +39,11 @@ static int constraints(const real_t* x,real_t* out){
 
     return SUCCESS;
 }
-static real_t constraints_forward_diff(const real_t* x,real_t* y,real_t* out){
+static int constraints_forward_diff(const real_t* x,const real_t* y,real_t* out){
     out[0]=-sin(x[0]+x[1])*y[0]+ -sin(x[0]+x[1])*y[1];
     out[1]=cos(x[0])*y[0]+0*y[1];
+
+    return SUCCESS;
 }
 
 static int test(void){
