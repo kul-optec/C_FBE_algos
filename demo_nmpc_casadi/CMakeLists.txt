@@ -1,5 +1,4 @@
-set(files_casadi cost_function_derivative_combined.c )
-set(files_casadi "${files_casadi}" casadi_interface.c)
+set(files_casadi cost_function_derivative_combined.c casadi_interface.c)
 
 MESSAGE(STATUS "Compiling demo with casadi and trailer model")
 
