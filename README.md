@@ -1,12 +1,8 @@
-# Draf_panoc
+# C_FBE_algos
 A simple library of the panoc algorithm with indicator box.
 
 ![graph with convergence time](timings.png)
 
-## TODO
-- Matlab recompiled library
-- Python interface
-- C#.NET interface
 # Matlab
 Manual installtion instructions are in the Matlab folder, however there are 3 scripts that automate the compilation:
 1. Matlab_install_windows.ps1 (uses powershell, visual studio and cmake)
