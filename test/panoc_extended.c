@@ -70,6 +70,7 @@ static int test(void){
     extended_problem.lower_bounds_constraints=low_bounds_constraints;
     extended_problem.upper_bounds_constraints=upper_bounds_constraints;
     extended_problem.constraints=constraints;
+	extended_problem.number_of_constraints = 2;
     extended_problem.constraints_forwad_diff=constraints_forward_diff;
 
     /*

@@ -35,7 +35,7 @@ int optimizer_init_extended_box(struct optimizer_extended_problem* extended_prob
     cost_gradient_function  = extended_problem->problem.cost_gradient_function; /* save the cost/gradient function */
     extended_problem->problem.cost_gradient_function=cost_gradient_function_LA; /* set the cost/gradient to the Lagragian cost/gradient*/
 
-    lagrangian_multipliers = malloc(sizeof(real_t)*extended_problem->problem.dimension);
+    lagrangian_multipliers = malloc(sizeof(real_t)*extended_problem->number_of_constraints);
     if(lagrangian_multipliers==NULL)goto fail_2;
 
     constraint_evaluations = malloc(sizeof(real_t)*extended_problem->number_of_constraints);
@@ -89,7 +89,7 @@ int solve_extended_problem(real_t* solution){
     unsigned i;
 
     /* init the slack variables to zero */
-    for (i = 0; i < extended_problem->number_of_constraints; i++){
+    for (i = 0; i < extended_problem->number_of_constraints-1; i++){
         lagrangian_multipliers[i]=0;
     }
 
