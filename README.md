@@ -1,3 +1,5 @@
+![travis](https://travis-ci.org/kul-forbes/C_FBE_algos.svg?branch=master)
+
 # C_FBE_algos
 A simple library of the panoc algorithm with indicator box.
 
