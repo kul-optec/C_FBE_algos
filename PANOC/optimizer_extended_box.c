@@ -89,7 +89,7 @@ int solve_extended_problem(real_t* solution){
     unsigned i;
 
     /* init the slack variables to zero */
-    for (i = 0; i < extended_problem->number_of_constraints-1; i++){
+    for (i = 0; i < extended_problem->number_of_constraints; i++){
         lagrangian_multipliers[i]=0;
     }
 
